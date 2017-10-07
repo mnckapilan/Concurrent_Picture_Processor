@@ -1,0 +1,22 @@
+liststore
+load images/ducks1.jpg duck1
+load images/ducks2.jpg duck2
+load images/ducks3.jpg duck3
+load images/ducks4.jpg duck4
+liststore
+invert duck1
+grayscale duck2
+rotate 180 duck3
+save duck1 images/psychedelic_art.jpg
+save duck2 images/boring.jpg
+unload duck1
+unload duck2
+load images/ducks1.jpg duck1
+load images/ducks2.jpg duck2
+flip H duck1
+save duck1 images/spot_the_difference.jpg
+blur duck2
+blur duck2
+blur duck2
+save duck2 images/need_glasses.jpg
+exit
