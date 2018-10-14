@@ -60,3 +60,11 @@ void Utils::displayimage(Mat img)
     destroyWindow("Picture processing");
 }
 
+int Utils::arrayAverage(int array[], int size){
+    int sum;
+    for (int i = 0; i < size; ++i) {
+        sum += array[i];
+    }
+    int avg = sum/size;
+    return avg;
+}

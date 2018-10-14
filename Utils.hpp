@@ -60,9 +60,8 @@ class Utils{
   /*clones the image provided as argument
    */
   Mat copyimage(Mat img);
-  
-  
-};
+
+  int arrayAverage(int array[], int size);
 
 #endif
 
