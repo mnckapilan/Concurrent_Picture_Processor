@@ -17,46 +17,80 @@ int main(int argc, char **argv) {
 //  cout << "TODO: Implement the C++ Picture Processing Interpreter" << endl;
 //  cout << "------------------------------------------------------" << endl;
 
+    PicLibrary library = PicLibrary();
 
-    // write main IO loop that runs the command-line interpreter interactive shell
+    for (int i = 1; argv[i] != NULL; ++i) {
+        char *name;
+        size_t name_start = string(argv[i]).rfind("/");
 
-    if (argc == 1) {
-        switch (argv) {
-            case "liststore":
-                cout << "list store" << endl;
-                break;
-            case "exit":
-                exit(0);
-            default:
-                return 0;
+        if (name_start == string::npos) {
+            name = argv[i];
+        } else {
+            name = &argv[i][name_start + 1];
         }
+
+        library.loadpicture(argv[i], name);
     }
-    if (argc == 2) {
-        switch (argv) {
-            case "liststore":
-                cout << "list store" << endl;
-                break;
-            case "exit":
-                exit(0);
-            default:
-                return 0;
+
+    string command, name, filepath;
+    int angle;
+    char plane;
+
+    cin >> command;
+
+    while (command != "exit") {
+
+        if (command == "liststore") {
+            library.print_picturestore();
         }
 
-        int counter;
-        printf("Program Name Is: %s", argv[0]);
-
-        if (argc == 1)
-            printf("\nNo Extra Command Line Argument Passed Other Than Program Name");
-
-        if (argc >= 2) {
-            printf("\nNumber Of Arguments Passed: %d", argc);
-            printf("\n----Following Are The Command Line Arguments Passed----");
-            for (counter = 0; counter < argc; counter++)
-                printf("\nargv[%d]: %s", counter, argv[counter]);
+        if (command == "load") {
+            cin >> filepath >> name;
+            library.loadpicture(filepath, name);
         }
-        return 0;
-        return 0;
 
+        if (command == "unload") {
+            cin >> name;
+            library.unloadpicture(name);
+        }
+
+        if (command == "save") {
+            cin >> name >> filepath;
+            library.savepicture(name, filepath);
+        }
+
+        if (command == "display") {
+            cin >> name;
+            library.display(name);
+        }
+
+        if (command == "invert") {
+            cin >> name;
+            library.invert(name);
+        }
+        if (command == "rotate") {
+            cin >> angle >> name;
+            library.rotate(angle, name);
+        }
+
+        if (command == "flip") {
+            cin >> plane >> name;
+            library.flipVH(plane, name);
+        }
+
+        if (command == "blur") {
+            cin >> name;
+            library.blur(name);
+        }
+
+        else {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        cin >> command;
     }
+    return 0;
+}
+
 
 

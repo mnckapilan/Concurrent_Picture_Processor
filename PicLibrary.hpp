@@ -10,7 +10,7 @@ class PicLibrary {
   // TODO: define internal picture storage 
 
   public:
-  // defaiult constructor/deconstructor
+  // default constructor/deconstructor
   PicLibrary(){};
   ~PicLibrary(){};
 
