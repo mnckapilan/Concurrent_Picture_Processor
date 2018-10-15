@@ -68,6 +68,11 @@ int main(int argc, char **argv) {
             cin >> name;
             library.invert(name);
         }
+
+        if (command == "grayscale"){
+            cin >> name;
+            library.grayscale(name);
+        }
         if (command == "rotate") {
             cin >> angle >> name;
             library.rotate(angle, name);
