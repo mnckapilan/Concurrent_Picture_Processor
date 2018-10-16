@@ -12,11 +12,6 @@ using namespace std;
 
 int main(int argc, char **argv) {
 
-//
-//  cout << "------------------------------------------------------" << endl;
-//  cout << "TODO: Implement the C++ Picture Processing Interpreter" << endl;
-//  cout << "------------------------------------------------------" << endl;
-
     PicLibrary library = PicLibrary();
 
     for (int i = 1; argv[i] != NULL; ++i) {

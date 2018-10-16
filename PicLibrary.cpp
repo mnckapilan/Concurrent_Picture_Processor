@@ -5,51 +5,99 @@
 
 Utils util;
 
+int PicLibrary::arrayAverage(int array[], int size){
+    int sum;
+    for (int i = 0; i < size; ++i) {
+        sum += array[i];
+    }
+    int avg = sum/size;
+    return avg;
+}
 
 void PicLibrary::print_picturestore() {
-}
-void PicLibrary::loadpicture(string path, string filename){
-}
-void PicLibrary::unloadpicture(string filename) {
-}
-void PicLibrary::savepicture(string filename, string path) {
-}
-void PicLibrary::display(string filename) {
-}
 
-
-void PicLibrary::invert(string filename) {
-    Picture original = Utils::loadimage(filename);
-    int width = original.getwidth();
-    int height = original.getheight();
-
-    Picture result = Picture(width, height);
-
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-
-            Colour originalColour = original.getpixel(x, y);
-
-            result.setpixel(x, y, Colour(
-                    255 - originalColour.getred(),
-                    255 - originalColour.getgreen(),
-                    255 - originalColour.getblue()
-                            )
-            );
-        }
+    for (auto const& pair : pictureStore) {
+        cout << pair.first << endl;
     }
 }
 
-void PicLibrary::grayscale(string filename) {
-    Picture original = Utils::loadimage(filename);
-    int width = original.getwidth();
-    int height = original.getheight();
+bool PicLibrary::loadpicture(string path, string filename) {
 
-    Picture result = Picture(width, height);
+    auto pic = make_shared<Picture>(new Picture(path));
+
+    if (pictureStore.find(filename) != pictureStore.end()) {
+        return false;
+    }
+
+    pictureStore[filename] = pic;
+    return true;
+}
+
+bool PicLibrary::unloadpicture(string filename) {
+
+    if (pictureStore.find(filename) == pictureStore.end()) {
+        return false;
+    }
+
+    pictureStore.erase(filename);
+    return true;
+}
+
+bool PicLibrary::savepicture(string filename, string path) {
+    if (pictureStore.find(filename) == pictureStore.end()) {
+        return false;
+    }
+    auto img = pictureStore[filename]->getimage();
+
+    Utils imgio;
+
+    return imgio.saveimage(img, path);
+}
+
+bool PicLibrary::display(string filename) {
+    if (pictureStore.find(filename) == pictureStore.end()) {
+        return false;
+    }
+
+    auto img = pictureStore[filename]->getimage();
+
+    Utils imgio;
+    imgio.displayimage(img);
+
+    return true;
+}
+
+void PicLibrary::invert(string filename) {
+
+    auto original = pictureStore[filename];
+
+        int width = original->getwidth();
+        int height = original->getheight();
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+
+                Colour originalColour = original->getpixel(x, y);
+
+                original->setpixel(x, y, Colour(
+                        255 - originalColour.getred(),
+                        255 - originalColour.getgreen(),
+                        255 - originalColour.getblue()
+                        ));
+            }
+        }
+}
+
+void PicLibrary::grayscale(string filename) {
+
+    auto original = pictureStore[filename];
+
+    int width = original->getwidth();
+    int height = original->getheight();
 
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            Colour originalColour = original.getpixel(x, y);
+            Colour originalColour = original->getpixel(x, y);
 
             int average = (
                                   originalColour.getred() +
@@ -57,148 +105,117 @@ void PicLibrary::grayscale(string filename) {
                                   originalColour.getblue()
                           ) / 3;
 
-            result.setpixel(x, y, Colour(average, average, average));
+            original->setpixel(x, y, Colour(average, average, average));
         }
     }
 }
 
 void PicLibrary::rotate(int angle, string filename) {
-    Picture original = Utils::loadimage(filename);
-    int width = original.getwidth();
-    int height = original.getheight();
 
-    if (angle == 180) {
+    if (angle == 270) {
+        rotate(180, filename);
+        rotate(90, filename);
+    }
 
-        Picture result = Utils::createimage(width, height);
+    else if (angle == 180) {
+        rotate(90, filename);
+        rotate(90, filename);
+    }
+
+    else {
+        auto original = pictureStore[filename];
+
+        int width = original->getwidth();
+        int height = original->getheight();
+
+        Picture result (height , width);
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-
-                Colour originalColour = original.getpixel(x, y);
-
-                Colour resultColour = Colour(
-                        originalColour.getred(),
-                        originalColour.getgreen(),
-                        originalColour.getblue()
-                );
-
-                result.setpixel(width - x, height - y, resultColour);
+                result.setpixel(height - 1 - y, x, original->getpixel(x, y));
             }
         }
-    } else if (angle == 90) {
 
-        Picture result = Utils::createimage(height, width);
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-            Colour originalColour = original.getpixel(x, y);
-
-            Colour resultColour = Colour(
-                    originalColour.getred(),
-                    originalColour.getgreen(),
-                    originalColour.getblue()
-            );
-
-            result.setpixel(width - y, x, resultColour);
-        }
+        original->setimage(result.getimage());
     }
 }
 
-else {
+    void PicLibrary::flipVH(char plane, string filename) {
 
-    Picture result = Utils::createimage(height, width);
+        auto original = pictureStore[filename];
 
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
+        int width = original->getwidth();
+        int height = original->getheight();
 
-            Colour originalColour = original.getpixel(x, y);
+        if (plane == 'H') {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    Colour originalColour = original->getpixel(x, y);
 
-            Colour resultColour = Colour(
-                    originalColour.getred(),
-                    originalColour.getgreen(),
-                    originalColour.getblue()
-            );
+                    Colour resultColour = Colour(
+                            originalColour.getred(),
+                            originalColour.getgreen(),
+                            originalColour.getblue()
+                    );
 
-            result.setpixel(y, width - x, resultColour);
-        }
-    }
-}
-
-void PicLibrary::flipVH(char plane, string filename) {
-
-    Picture original = Utils::loadimage(filename);
-    int width = original.getwidth();
-    int height = original.getheight();
-
-    if (plane == 'H') {
-        Picture result = Utils::createimage(width, height);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Colour originalColour = original.getpixel(x, y);
-
-                Colour resultColour = Colour(
-                        originalColour.getred(),
-                        originalColour.getgreen(),
-                        originalColour.getblue()
-                );
-
-                result.setpixel(width - x, y, resultColour);
-            }
-        }
-    }
-
-    if (plane == 'V') {
-        Picture result = Utils::createimage(width, height);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Colour originalColour = original.getpixel(x, y);
-
-                Colour resultColour = Colour(
-                        originalColour.getred(),
-                        originalColour.getgreen(),
-                        originalColour.getblue()
-                );
-
-                result.setpixel(x, height - y, resultColour);
-            }
-        }
-    }
-}
-
-void PicLibrary::blur(string filename) {
-
-    Picture original = Utils::loadimage(filename);
-    int width = original.getwidth();
-    int height = original.getheight();
-
-    Picture result = Utils::createimage(width, height);
-
-    for (int x = 1; x < width - 1; x++) {
-        for (int y = 1; y < height - 1; y++) {
-
-            int redList[9];
-            int greenList[9];
-            int blueList[9];
-
-            int count = 0;
-
-            for (int i = x - 1; i <= x + 1; i++) {
-                for (int j = y - 1; j <= y + 1; j++) {
-
-                    Colour originalColour = original.getpixel(i, j);
-
-                    redList[count] = originalColour.getred();
-                    greenList[count] = originalColour.getgreen();
-                    blueList[count] = originalColour.getblue();
-
-                    count++;
+                    original->setpixel(width - x, y, resultColour);
                 }
             }
-            int newRed = Utils::arrayAverage(redList, 9);
-            int newGreen = Utils::arrayAverage(greenList, 9);
-            int newBlue = Utils::arrayAverage(blueList, 9);
-            Colour resultColour = Colour(newRed, newGreen, newBlue);
-            result.setpixel(x, y, resultColour);
+        }
+
+        if (plane == 'V') {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    Colour originalColour = original->getpixel(x, y);
+
+                    Colour resultColour = Colour(
+                            originalColour.getred(),
+                            originalColour.getgreen(),
+                            originalColour.getblue()
+                    );
+
+                    original->setpixel(x, height - y, resultColour);
+                }
+            }
         }
     }
-}
+
+    void PicLibrary::blur(string filename) {
+
+        auto original = pictureStore[filename];
+
+        int width = original->getwidth();
+        int height = original->getheight();
+
+        Picture result (width, height);
+
+        for (int x = 1; x < width - 1; x++) {
+            for (int y = 1; y < height - 1; y++) {
+
+                int redList[9];
+                int greenList[9];
+                int blueList[9];
+
+                int count = 0;
+
+                for (int i = x - 1; i <= x + 1; i++) {
+                    for (int j = y - 1; j <= y + 1; j++) {
+
+                        Colour originalColour = original->getpixel(i, j);
+
+                        redList[count] = originalColour.getred();
+                        greenList[count] = originalColour.getgreen();
+                        blueList[count] = originalColour.getblue();
+
+                        count++;
+                    }
+                }
+                int newRed = arrayAverage(redList, 9);
+                int newGreen = arrayAverage(greenList, 9);
+                int newBlue = arrayAverage(blueList, 9);
+                Colour resultColour = Colour(newRed, newGreen, newBlue);
+                result.setpixel(x, y, resultColour);
+            }
+        }
+        original->setimage(result.getimage());
+    }

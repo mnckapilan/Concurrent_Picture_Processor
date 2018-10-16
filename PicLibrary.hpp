@@ -7,8 +7,9 @@
 class PicLibrary {
 
   private:
-  // TODO: define internal picture storage 
-
+    std::map<std::string, shared_ptr<Picture>> pictureStore;
+    Picture getPicture(string filename);
+    int arrayAverage(int array[], int size);
   public:
   // default constructor/deconstructor
   PicLibrary(){};
@@ -16,11 +17,11 @@ class PicLibrary {
 
   // command-line interpreter routines
   void print_picturestore();
-  void loadpicture(string path, string filename);
-  void unloadpicture(string filename);
-  void savepicture(string filename, string path);
-  void display(string filename);
-  
+  bool loadpicture(string path, string filename);
+  bool unloadpicture(string filename);
+  bool savepicture(string filename, string path);
+  bool display(string filename);
+
   // picture transformation routines
   void invert(string filename);
   void grayscale(string filename);
