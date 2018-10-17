@@ -195,7 +195,7 @@ void PicLibrary::rotate(int angle, string filename) {
         int width = original->getwidth();
         int height = original->getheight();
 
-        Picture result (width, height);
+        Picture result = *original;
 
         for (int x = 1; x < width - 1; x++) {
             for (int y = 1; y < height - 1; y++) {
