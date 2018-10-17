@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 #include "Colour.hpp"
 #include "Utils.hpp"
@@ -16,6 +17,7 @@ int main(int argc, char **argv) {
 
     for (int i = 1; argv[i] != NULL; ++i) {
         char *name;
+
         size_t name_start = string(argv[i]).rfind("/");
 
         if (name_start == string::npos) {
@@ -27,66 +29,87 @@ int main(int argc, char **argv) {
         library.loadpicture(argv[i], name);
     }
 
-    string command, name, filepath;
+    string command, filename, path;
     int angle;
     char plane;
 
+    cout << "prmt>";
     cin >> command;
 
-    while (command != "exit") {
-
+    while (command != "exit" && cin.peek() != EOF) {
         if (command == "liststore") {
             library.print_picturestore();
         }
 
         if (command == "load") {
-            cin >> filepath >> name;
-            library.loadpicture(filepath, name);
+            cin >> path >> filename;
+            if(library.didPictureLoad(filename)){
+                cerr << "Error when loading picture at " << path << ": picture named " << filename << " already exists in store" << endl;
+            }
+            library.loadpicture(path, filename);
         }
 
         if (command == "unload") {
-            cin >> name;
-            library.unloadpicture(name);
+            cin >> filename;
+            bool success = library.unloadpicture(filename);
+            if (success){
+                cout << "unloaded" << filename << "successfully!" << endl;
+            }
+            else {
+                cerr << "Error when unloading " << filename << endl;
+            }
         }
 
         if (command == "save") {
-            cin >> name >> filepath;
-            library.savepicture(name, filepath);
+            cin >> filename >> path;
+            bool success = library.savepicture(filename, path);
+            if (success){
+                cout << "saved" << filename << "at" << path << "successfully!" << endl;
+            }
+            else {
+                cerr << "Error when saving picture at " << path << endl;
+            }
         }
 
         if (command == "display") {
-            cin >> name;
-            library.display(name);
+            cin >> filename;
+            bool success = library.display(filename);
+            if (success){
+                cout << "displaying" << filename << "" << endl;
+            }
+            else {
+                cerr << "Error when trying to display " << filename << endl;
+            }
         }
 
         if (command == "invert") {
-            cin >> name;
-            library.invert(name);
+            cin >> filename;
+            library.invert(filename);
         }
 
         if (command == "grayscale"){
-            cin >> name;
-            library.grayscale(name);
+            cin >> filename;
+            library.grayscale(filename);
         }
         if (command == "rotate") {
-            cin >> angle >> name;
-            library.rotate(angle, name);
+            cin >> angle >> filename;
+            library.rotate(angle, filename);
         }
 
         if (command == "flip") {
-            cin >> plane >> name;
-            library.flipVH(plane, name);
+            cin >> plane >> filename;
+            library.flipVH(plane, filename);
         }
 
         if (command == "blur") {
-            cin >> name;
-            library.blur(name);
+            cin >> filename;
+            library.blur(filename);
         }
 
         else {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
-
+        cout << "prmt>";
         cin >> command;
     }
     return 0;

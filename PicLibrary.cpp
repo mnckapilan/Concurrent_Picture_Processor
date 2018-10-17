@@ -3,7 +3,7 @@
 #include "Picture.hpp"
 #include "Utils.hpp"
 
-Utils util;
+using namespace std;
 
 int PicLibrary::arrayAverage(int array[], int size){
     int sum;
@@ -14,6 +14,11 @@ int PicLibrary::arrayAverage(int array[], int size){
     return avg;
 }
 
+bool PicLibrary::didPictureLoad(string filename){
+    return pictureStore.find(filename) != pictureStore.end();
+}
+
+
 void PicLibrary::print_picturestore() {
 
     for (auto const& pair : pictureStore) {
@@ -23,13 +28,13 @@ void PicLibrary::print_picturestore() {
 
 bool PicLibrary::loadpicture(string path, string filename) {
 
-    auto pic = make_shared<Picture>(new Picture(path));
+    auto picture = make_shared<Picture>(Picture(path));
 
     if (pictureStore.find(filename) != pictureStore.end()) {
         return false;
     }
 
-    pictureStore[filename] = pic;
+    pictureStore[filename] = picture;
     return true;
 }
 
@@ -44,25 +49,28 @@ bool PicLibrary::unloadpicture(string filename) {
 }
 
 bool PicLibrary::savepicture(string filename, string path) {
+
     if (pictureStore.find(filename) == pictureStore.end()) {
         return false;
     }
-    auto img = pictureStore[filename]->getimage();
+
+    auto image = pictureStore[filename]->getimage();
 
     Utils imgio;
 
-    return imgio.saveimage(img, path);
+    return imgio.saveimage(image, path);
 }
 
 bool PicLibrary::display(string filename) {
+
     if (pictureStore.find(filename) == pictureStore.end()) {
         return false;
     }
 
-    auto img = pictureStore[filename]->getimage();
+    auto image = pictureStore[filename]->getimage();
 
     Utils imgio;
-    imgio.displayimage(img);
+    imgio.displayimage(image);
 
     return true;
 }

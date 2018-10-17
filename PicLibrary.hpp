@@ -1,6 +1,10 @@
 #ifndef PICLIB_H
 #define PICLIB_H
 
+#include <map>
+#include <memory>
+#include <string>
+
 #include "Picture.hpp"
 #include "Utils.hpp"
 
@@ -8,9 +12,12 @@ class PicLibrary {
 
   private:
     std::map<std::string, shared_ptr<Picture>> pictureStore;
-    Picture getPicture(string filename);
+//    Picture getPicture(string filename);
+
     int arrayAverage(int array[], int size);
-  public:
+
+
+public:
   // default constructor/deconstructor
   PicLibrary(){};
   ~PicLibrary(){};
@@ -21,6 +28,10 @@ class PicLibrary {
   bool unloadpicture(string filename);
   bool savepicture(string filename, string path);
   bool display(string filename);
+
+  //added functions
+  bool didPictureLoad(string filename);
+
 
   // picture transformation routines
   void invert(string filename);
