@@ -200,9 +200,9 @@ void PicLibrary::rotate(int angle, string filename) {
         for (int x = 1; x < width - 1; x++) {
             for (int y = 1; y < height - 1; y++) {
 
-                int redList[9];
-                int greenList[9];
-                int blueList[9];
+                int redList[BLUR_STRENGTH];
+                int greenList[BLUR_STRENGTH];
+                int blueList[BLUR_STRENGTH];
 
                 int count = 0;
 
@@ -218,9 +218,9 @@ void PicLibrary::rotate(int angle, string filename) {
                         count++;
                     }
                 }
-                int newRed = arrayAverage(redList, 9);
-                int newGreen = arrayAverage(greenList, 9);
-                int newBlue = arrayAverage(blueList, 9);
+                int newRed = arrayAverage(redList, BLUR_STRENGTH);
+                int newGreen = arrayAverage(greenList, BLUR_STRENGTH);
+                int newBlue = arrayAverage(blueList, BLUR_STRENGTH);
                 Colour resultColour = Colour(newRed, newGreen, newBlue);
                 result.setpixel(x, y, resultColour);
             }

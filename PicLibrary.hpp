@@ -1,6 +1,8 @@
 #ifndef PICLIB_H
 #define PICLIB_H
 
+#define BLUR_STRENGTH 9
+
 #include <map>
 #include <memory>
 #include <string>
