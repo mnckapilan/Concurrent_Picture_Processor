@@ -5,23 +5,23 @@
 
 using namespace std;
 
-int PicLibrary::arrayAverage(int array[], int size){
+int PicLibrary::arrayAverage(int array[], int size) {
     int sum;
     for (int i = 0; i < size; ++i) {
         sum += array[i];
     }
-    int avg = sum/size;
+    int avg = sum / size;
     return avg;
 }
 
-bool PicLibrary::didPictureLoad(string filename){
+bool PicLibrary::didPictureLoad(string filename) {
     return pictureStore.find(filename) != pictureStore.end();
 }
 
 
 void PicLibrary::print_picturestore() {
 
-    for (auto const& pair : pictureStore) {
+    for (auto const &pair : pictureStore) {
         cout << pair.first << endl;
     }
 }
@@ -79,21 +79,21 @@ void PicLibrary::invert(string filename) {
 
     auto original = pictureStore[filename];
 
-        int width = original->getwidth();
-        int height = original->getheight();
+    int width = original->getwidth();
+    int height = original->getheight();
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
 
-                Colour originalColour = original->getpixel(x, y);
+            Colour originalColour = original->getpixel(x, y);
 
-                original->setpixel(x, y, Colour(
-                        255 - originalColour.getred(),
-                        255 - originalColour.getgreen(),
-                        255 - originalColour.getblue()
-                        ));
-            }
+            original->setpixel(x, y, Colour(
+                    255 - originalColour.getred(),
+                    255 - originalColour.getgreen(),
+                    255 - originalColour.getblue()
+            ));
         }
+    }
 }
 
 void PicLibrary::grayscale(string filename) {
@@ -123,20 +123,16 @@ void PicLibrary::rotate(int angle, string filename) {
     if (angle == 270) {
         rotate(180, filename);
         rotate(90, filename);
-    }
-
-    else if (angle == 180) {
+    } else if (angle == 180) {
         rotate(90, filename);
         rotate(90, filename);
-    }
-
-    else {
+    } else {
         auto original = pictureStore[filename];
 
         int width = original->getwidth();
         int height = original->getheight();
 
-        Picture result (height , width);
+        Picture result(height, width);
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -148,82 +144,68 @@ void PicLibrary::rotate(int angle, string filename) {
     }
 }
 
-    void PicLibrary::flipVH(char plane, string filename) {
+void PicLibrary::flipVH(char plane, string filename) {
 
-        auto original = pictureStore[filename];
+    auto original = pictureStore[filename];
 
-        int width = original->getwidth();
-        int height = original->getheight();
+    int width = original->getwidth();
+    int height = original->getheight();
 
-        if (plane == 'H') {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    Colour originalColour = original->getpixel(x, y);
+    Picture result = Picture(width, height);
 
-                    Colour resultColour = Colour(
-                            originalColour.getred(),
-                            originalColour.getgreen(),
-                            originalColour.getblue()
-                    );
-
-                    original->setpixel(width - x, y, resultColour);
-                }
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            if (plane != 'H' && plane != 'V'){
+                cout << "invalid input" << endl;
+                return;
             }
-        }
-
-        if (plane == 'V') {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    Colour originalColour = original->getpixel(x, y);
-
-                    Colour resultColour = Colour(
-                            originalColour.getred(),
-                            originalColour.getgreen(),
-                            originalColour.getblue()
-                    );
-
-                    original->setpixel(x, height - y, resultColour);
-                }
+            if (plane == 'H') {
+                result.setpixel(width - x, y, original->getpixel(x, y));
+            }
+            if (plane == 'V'){
+                result.setpixel(x, height - y, original->getpixel(x, y));
             }
         }
     }
+    original->setimage(result.getimage());
+}
 
-    void PicLibrary::blur(string filename) {
+void PicLibrary::blur(string filename) {
 
-        auto original = pictureStore[filename];
+    auto original = pictureStore[filename];
 
-        int width = original->getwidth();
-        int height = original->getheight();
+    int width = original->getwidth();
+    int height = original->getheight();
 
-        Picture result = *original;
+    Picture result = *original;
 
-        for (int x = 1; x < width - 1; x++) {
-            for (int y = 1; y < height - 1; y++) {
+    for (int x = 1; x < width - 1; x++) {
+        for (int y = 1; y < height - 1; y++) {
 
-                int redList[BLUR_STRENGTH];
-                int greenList[BLUR_STRENGTH];
-                int blueList[BLUR_STRENGTH];
+            int redList[BLUR_STRENGTH];
+            int greenList[BLUR_STRENGTH];
+            int blueList[BLUR_STRENGTH];
 
-                int count = 0;
+            int count = 0;
 
-                for (int i = x - 1; i <= x + 1; i++) {
-                    for (int j = y - 1; j <= y + 1; j++) {
+            for (int i = x - 1; i <= x + 1; i++) {
+                for (int j = y - 1; j <= y + 1; j++) {
 
-                        Colour originalColour = original->getpixel(i, j);
+                    Colour originalColour = original->getpixel(i, j);
 
-                        redList[count] = originalColour.getred();
-                        greenList[count] = originalColour.getgreen();
-                        blueList[count] = originalColour.getblue();
+                    redList[count] = originalColour.getred();
+                    greenList[count] = originalColour.getgreen();
+                    blueList[count] = originalColour.getblue();
 
-                        count++;
-                    }
+                    count++;
                 }
-                int newRed = arrayAverage(redList, BLUR_STRENGTH);
-                int newGreen = arrayAverage(greenList, BLUR_STRENGTH);
-                int newBlue = arrayAverage(blueList, BLUR_STRENGTH);
-                Colour resultColour = Colour(newRed, newGreen, newBlue);
-                result.setpixel(x, y, resultColour);
             }
+            int newRed = arrayAverage(redList, BLUR_STRENGTH);
+            int newGreen = arrayAverage(greenList, BLUR_STRENGTH);
+            int newBlue = arrayAverage(blueList, BLUR_STRENGTH);
+            Colour resultColour = Colour(newRed, newGreen, newBlue);
+            result.setpixel(x, y, resultColour);
         }
-        original->setimage(result.getimage());
     }
+    original->setimage(result.getimage());
+}
