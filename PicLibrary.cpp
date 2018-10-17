@@ -155,16 +155,13 @@ void PicLibrary::flipVH(char plane, string filename) {
 
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            if (plane != 'H' && plane != 'V'){
-                cout << "invalid input" << endl;
-                return;
+            Colour newColour(0, 0, 0);
+            if (plane == 'V') {
+                newColour = original->getpixel(x, height - 1 - y);
+            } else {
+                newColour = original->getpixel(width - 1 - x, y);
             }
-            if (plane == 'H') {
-                result.setpixel(width - x, y, original->getpixel(x, y));
-            }
-            if (plane == 'V'){
-                result.setpixel(x, height - y, original->getpixel(x, y));
-            }
+            result.setpixel(x, y, newColour);
         }
     }
     original->setimage(result.getimage());
