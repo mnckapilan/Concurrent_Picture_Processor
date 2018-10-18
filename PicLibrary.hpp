@@ -2,6 +2,7 @@
 #define PICLIB_H
 
 #define BLUR_STRENGTH 9
+#define BLUR_RADIUS 1
 
 #include <map>
 #include <memory>

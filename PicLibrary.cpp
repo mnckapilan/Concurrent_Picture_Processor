@@ -174,34 +174,26 @@ void PicLibrary::blur(string filename) {
     int width = original->getwidth();
     int height = original->getheight();
 
-    Picture result = *original;
+    Picture result = Picture(width, height);
 
-    for (int x = 1; x < width - 1; x++) {
-        for (int y = 1; y < height - 1; y++) {
-
-            int redList[BLUR_STRENGTH];
-            int greenList[BLUR_STRENGTH];
-            int blueList[BLUR_STRENGTH];
-
-            int count = 0;
-
-            for (int i = x - 1; i <= x + 1; i++) {
-                for (int j = y - 1; j <= y + 1; j++) {
-
-                    Colour originalColour = original->getpixel(i, j);
-
-                    redList[count] = originalColour.getred();
-                    greenList[count] = originalColour.getgreen();
-                    blueList[count] = originalColour.getblue();
-
-                    count++;
+    for(int i = 0; i < height; i++) {
+        for(int j = 0; j < width; j++) {
+            if((i != 0) && (j != 0) && (i != (height - 1)) && (j != (width - 1))) {
+                int red = 0;
+                int blue = 0;
+                int green = 0;
+                for(int k = (i - BLUR_RADIUS); k <= (i + BLUR_RADIUS); ++k) {
+                    for(int l = (j - BLUR_RADIUS); l <= (j + BLUR_RADIUS); ++l) {
+                        Colour originalColour = original->getpixel(l, k);
+                        red += originalColour.getred();
+                        green += originalColour.getgreen();
+                        blue += originalColour.getblue();
+                    }
                 }
+                result.setpixel(j, i, Colour (red/BLUR_STRENGTH, green/BLUR_STRENGTH, blue/BLUR_STRENGTH));
+            } else {
+                result.setpixel(j, i, original->getpixel(j, i));
             }
-            int newRed = arrayAverage(redList, BLUR_STRENGTH);
-            int newGreen = arrayAverage(greenList, BLUR_STRENGTH);
-            int newBlue = arrayAverage(blueList, BLUR_STRENGTH);
-            Colour resultColour = Colour(newRed, newGreen, newBlue);
-            result.setpixel(x, y, resultColour);
         }
     }
     original->setimage(result.getimage());
