@@ -11,22 +11,27 @@ using namespace std;
 
 // TODO: Implement the picture library command-line interpreter
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 
     PicLibrary library = PicLibrary();
 
-    for (int i = 1; argv[i] != NULL; ++i) {
-        char *name;
+    for (int i = 1; i < argc; i++)
+    {
+        string path = argv[i];
 
-        size_t name_start = string(argv[i]).rfind("/");
-
-        if (name_start == string::npos) {
-            name = argv[i];
-        } else {
-            name = &argv[i][name_start + 1];
+        string filename;
+        int pos = path.find_last_of('/');
+        if (pos == string::npos)
+        {
+            filename = path;
+        }
+        else
+        {
+            filename = path.substr(pos + 1);
         }
 
-        library.loadpicture(argv[i], name);
+        library.loadpicture(path, filename);
     }
 
     string command, filename, path;
@@ -36,77 +41,100 @@ int main(int argc, char **argv) {
     cout << "prmt>";
     cin >> command;
 
-    while (command != "exit" && cin.peek() != EOF) {
-        if (command == "liststore") {
+    while (command != "exit" && cin.peek() != EOF)
+    {
+        if (command == "liststore")
+        {
             library.print_picturestore();
         }
 
-        if (command == "load") {
+        if (command == "load")
+        {
             cin >> path >> filename;
-            // if(library.didPictureLoad(filename)){
-            //     cerr << "Error when loading picture at " << path << ": picture named " << filename << " already exists in store" << endl;
-            // }
-            library.loadpicture(path, filename);
+            if (library.didPictureLoad(filename))
+            {
+                cerr << "Error when loading picture at " << path << ": picture named " << filename << " already exists in store" << endl;
+            }
+            bool success = library.loadpicture(path, filename);
+            if (success)
+            {
+                cout << "picture loaded successfully from " << path;
+            }
         }
 
-        if (command == "unload") {
+        if (command == "unload")
+        {
             cin >> filename;
             bool success = library.unloadpicture(filename);
-            if (success){
+            if (success)
+            {
                 cout << "unloaded" << filename << "successfully!" << endl;
             }
-            else {
+            else
+            {
                 cerr << "Error when unloading " << filename << endl;
             }
         }
 
-        if (command == "save") {
+        if (command == "save")
+        {
             cin >> filename >> path;
             bool success = library.savepicture(filename, path);
-            if (success){
+            if (success)
+            {
                 cout << "saved" << filename << "at" << path << "successfully!" << endl;
             }
-            else {
+            else
+            {
                 cerr << "Error when saving picture at " << path << endl;
             }
         }
 
-        if (command == "display") {
+        if (command == "display")
+        {
             cin >> filename;
             bool success = library.display(filename);
-            if (success){
+            if (success)
+            {
                 cout << "displaying" << filename << "" << endl;
             }
-            else {
+            else
+            {
                 cerr << "Error when trying to display " << filename << endl;
             }
         }
 
-        if (command == "invert") {
+        if (command == "invert")
+        {
             cin >> filename;
             library.invert(filename);
         }
 
-        if (command == "grayscale"){
+        if (command == "grayscale")
+        {
             cin >> filename;
             library.grayscale(filename);
         }
-        if (command == "rotate") {
+        if (command == "rotate")
+        {
             cin >> angle >> filename;
             library.rotate(angle, filename);
         }
 
-        if (command == "flip") {
+        if (command == "flip")
+        {
             cin >> plane >> filename;
             library.flipVH(plane, filename);
         }
 
-        if (command == "blur") {
+        if (command == "blur")
+        {
             cin >> filename;
             library.blur(filename);
         }
 
-        else {
+        else
+        {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
         cout << "prmt>";
@@ -114,6 +142,3 @@ int main(int argc, char **argv) {
     }
     return 0;
 }
-
-
-
