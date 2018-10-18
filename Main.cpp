@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 #include "Colour.hpp"
 #include "Utils.hpp"
@@ -9,10 +10,11 @@
 
 using namespace std;
 
-// TODO: Implement the picture library command-line interpreter
-
 int main(int argc, char **argv)
 {
+    thread t1;
+    vector<thread> threads;
+    unsigned ConcurrentThreadSupport = thread::hardware_concurrency();
 
     PicLibrary library = PicLibrary();
 
@@ -45,30 +47,32 @@ int main(int argc, char **argv)
     {
         if (command == "liststore")
         {
+            library.joinAllThreads();
             library.print_picturestore();
         }
 
         if (command == "load")
         {
             cin >> path >> filename;
-            if (library.didPictureLoad(filename))
+            if (library.alreadyInStore(filename))
             {
-                cerr << "Error when loading picture at " << path << ": picture named " << filename << " already exists in store" << endl;
+                cerr << " Error when loading picture at " << path << " : picture named " << filename << " already exists in store" << endl;
             }
             bool success = library.loadpicture(path, filename);
             if (success)
             {
-                cout << "picture loaded successfully from " << path;
+                cout << " picture loaded successfully from " << path <<endl;
             }
         }
 
         if (command == "unload")
         {
             cin >> filename;
+            library.joinPictureThreads(filename);
             bool success = library.unloadpicture(filename);
             if (success)
             {
-                cout << "unloaded" << filename << "successfully!" << endl;
+                cout << "unloaded " << filename << " successfully!" << endl;
             }
             else
             {
@@ -79,10 +83,11 @@ int main(int argc, char **argv)
         if (command == "save")
         {
             cin >> filename >> path;
+            library.joinPictureThreads(filename);
             bool success = library.savepicture(filename, path);
             if (success)
             {
-                cout << "saved" << filename << "at" << path << "successfully!" << endl;
+                cout << " saved " << filename << " at " << path << " successfully!" << endl;
             }
             else
             {
@@ -93,6 +98,7 @@ int main(int argc, char **argv)
         if (command == "display")
         {
             cin >> filename;
+            library.joinPictureThreads(filename);
             bool success = library.display(filename);
             if (success)
             {
@@ -107,30 +113,50 @@ int main(int argc, char **argv)
         if (command == "invert")
         {
             cin >> filename;
-            library.invert(filename);
+            if (library.alreadyInStore(filename))
+            {
+                auto container = library.getContainer(filename);
+                container->_threads.push_back(thread(&PicLibrary::invert, &library, filename));
+            }
         }
 
         if (command == "grayscale")
         {
             cin >> filename;
-            library.grayscale(filename);
+            if (library.alreadyInStore(filename))
+            {
+                auto container = library.getContainer(filename);
+                container->_threads.push_back(thread(&PicLibrary::grayscale, &library, filename));
+            }
         }
         if (command == "rotate")
         {
             cin >> angle >> filename;
-            library.rotate(angle, filename);
+            if (library.alreadyInStore(filename))
+            {
+                auto container = library.getContainer(filename);
+                container->_threads.push_back(thread(&PicLibrary::rotate, &library, angle, filename));
+            }
         }
 
         if (command == "flip")
         {
             cin >> plane >> filename;
-            library.flipVH(plane, filename);
+            if (library.alreadyInStore(filename))
+            {
+                auto container = library.getContainer(filename);
+                container->_threads.push_back(thread(&PicLibrary::flipVH, &library, plane, filename));
+            }
         }
 
         if (command == "blur")
         {
             cin >> filename;
-            library.blur(filename);
+            if (library.alreadyInStore(filename))
+            {
+                auto container = library.getContainer(filename);
+                container->_threads.push_back(thread(&PicLibrary::blur, &library, filename));
+            }
         }
 
         else
@@ -140,5 +166,6 @@ int main(int argc, char **argv)
         cout << "prmt>";
         cin >> command;
     }
+    library.joinAllThreads();
     return 0;
 }

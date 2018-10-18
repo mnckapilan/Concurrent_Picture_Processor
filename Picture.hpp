@@ -1,6 +1,9 @@
 #ifndef PICTURE_H
 #define PICTURE_H
 
+#include<thread>
+#include<mutex>
+
 #include "Colour.hpp"
 #include "Utils.hpp"
 
@@ -48,5 +51,13 @@ class Picture {
   void setimage(Mat cpyimg);
   
  };
+class PictureContainer {
+public:
+    Picture _pic;
+    vector<thread> _threads;
+    mutex _mtx;
 
+    PictureContainer(Picture *pic);
+    ~PictureContainer();
+};
 #endif

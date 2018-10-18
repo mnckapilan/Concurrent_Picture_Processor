@@ -4,21 +4,21 @@
 #define BLUR_STRENGTH 9
 #define BLUR_RADIUS 1
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <string>
+#include <atomic>
+#include <mutex>
 
 #include "Picture.hpp"
 #include "Utils.hpp"
 
-class PicLibrary {
+class PicLibrary
+{
 
-  private:
-    std::map<std::string, shared_ptr<Picture>> pictureStore;
-//    Picture getPicture(string filename);
-
-    int arrayAverage(int array[], int size);
-
+private:
+  std::map<std::string, PictureContainer *> pictureStore;
+  int arrayAverage(int array[], int size);
 
 public:
   // default constructor/deconstructor
@@ -33,8 +33,10 @@ public:
   bool display(string filename);
 
   //added functions
-  bool didPictureLoad(string filename);
-
+  PictureContainer* getContainer(string filename);
+  bool alreadyInStore(string filename);
+  void joinAllThreads();
+  void joinPictureThreads(string filename);
 
   // picture transformation routines
   void invert(string filename);
@@ -45,4 +47,3 @@ public:
 };
 
 #endif
-

@@ -5,42 +5,56 @@
 
 using namespace std;
 
-int PicLibrary::arrayAverage(int array[], int size) {
+int PicLibrary::arrayAverage(int array[], int size)
+{
     int sum;
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i)
+    {
         sum += array[i];
     }
     int avg = sum / size;
     return avg;
 }
 
-bool PicLibrary::didPictureLoad(string filename) {
+bool PicLibrary::alreadyInStore(string filename)
+{
     return pictureStore.find(filename) != pictureStore.end();
 }
 
+void PicLibrary::print_picturestore()
+{
 
-void PicLibrary::print_picturestore() {
-
-    for (auto const &pair : pictureStore) {
-        cout << pair.first << endl;
+    for (auto const &pair : pictureStore)
+    {
+        cout << pair.first << std::flush << endl;
     }
 }
 
-bool PicLibrary::loadpicture(string path, string filename) {
-
-    auto picture = make_shared<Picture>(Picture(path));
-
-    if (pictureStore.find(filename) != pictureStore.end()) {
+bool PicLibrary::loadpicture(string path, string filename)
+{
+    if (pictureStore.find(filename) != pictureStore.end())
+    {
         return false;
     }
-
-    pictureStore[filename] = picture;
+    Picture *toBeAdded = new Picture(path);
+    if (toBeAdded->getwidth() != 0)
+    {
+        PictureContainer *container = new PictureContainer(toBeAdded);
+        pictureStore.insert({filename, container});
+        cout << filename << " successfully loaded! " << endl;
+    }
+    else
+    {
+        cout << path << " exists only in your imagination! " << endl;
+    }
     return true;
 }
 
-bool PicLibrary::unloadpicture(string filename) {
+bool PicLibrary::unloadpicture(string filename)
+{
 
-    if (pictureStore.find(filename) == pictureStore.end()) {
+    if (pictureStore.find(filename) == pictureStore.end())
+    {
         return false;
     }
 
@@ -48,26 +62,30 @@ bool PicLibrary::unloadpicture(string filename) {
     return true;
 }
 
-bool PicLibrary::savepicture(string filename, string path) {
+bool PicLibrary::savepicture(string filename, string path)
+{
 
-    if (pictureStore.find(filename) == pictureStore.end()) {
+    if (pictureStore.find(filename) == pictureStore.end())
+    {
         return false;
     }
 
-    auto image = pictureStore[filename]->getimage();
+    auto image = pictureStore[filename]->_pic.getimage();
 
     Utils imgio;
 
     return imgio.saveimage(image, path);
 }
 
-bool PicLibrary::display(string filename) {
+bool PicLibrary::display(string filename)
+{
 
-    if (pictureStore.find(filename) == pictureStore.end()) {
+    if (pictureStore.find(filename) == pictureStore.end())
+    {
         return false;
     }
 
-    auto image = pictureStore[filename]->getimage();
+    auto image = pictureStore[filename]->_pic.getimage();
 
     Utils imgio;
     imgio.displayimage(image);
@@ -75,126 +93,179 @@ bool PicLibrary::display(string filename) {
     return true;
 }
 
-void PicLibrary::invert(string filename) {
+void PicLibrary::invert(string filename)
+{
 
     auto original = pictureStore[filename];
+    std::lock_guard<std::mutex> lock(original->_mtx);
 
-    int width = original->getwidth();
-    int height = original->getheight();
+    int width = original->_pic.getwidth();
+    int height = original->_pic.getheight();
 
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
 
-            Colour originalColour = original->getpixel(x, y);
+            Colour originalColour = original->_pic.getpixel(x, y);
 
-            original->setpixel(x, y, Colour(
-                    255 - originalColour.getred(),
-                    255 - originalColour.getgreen(),
-                    255 - originalColour.getblue()
-            ));
+            original->_pic.setpixel(x, y, Colour(255 - originalColour.getred(), 255 - originalColour.getgreen(), 255 - originalColour.getblue()));
         }
     }
 }
 
-void PicLibrary::grayscale(string filename) {
+void PicLibrary::grayscale(string filename)
+{
 
     auto original = pictureStore[filename];
+    std::lock_guard<std::mutex> lock(original->_mtx);
 
-    int width = original->getwidth();
-    int height = original->getheight();
+    int width = original->_pic.getwidth();
+    int height = original->_pic.getheight();
 
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            Colour originalColour = original->getpixel(x, y);
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            Colour originalColour = original->_pic.getpixel(x, y);
 
-            int average = (
-                                  originalColour.getred() +
-                                  originalColour.getgreen() +
-                                  originalColour.getblue()
-                          ) / 3;
+            int average = (originalColour.getred() +
+                           originalColour.getgreen() +
+                           originalColour.getblue()) /
+                          3;
 
-            original->setpixel(x, y, Colour(average, average, average));
+            original->_pic.setpixel(x, y, Colour(average, average, average));
         }
     }
 }
 
-void PicLibrary::rotate(int angle, string filename) {
+void PicLibrary::rotate(int angle, string filename)
+{
 
-    if (angle == 270) {
+    if (angle == 270)
+    {
         rotate(180, filename);
         rotate(90, filename);
-    } else if (angle == 180) {
+    }
+    else if (angle == 180)
+    {
         rotate(90, filename);
         rotate(90, filename);
-    } else {
+    }
+    else
+    {
         auto original = pictureStore[filename];
+        std::lock_guard<std::mutex> lock(original->_mtx);
 
-        int width = original->getwidth();
-        int height = original->getheight();
+        int width = original->_pic.getwidth();
+        int height = original->_pic.getheight();
 
         Picture result(height, width);
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                result.setpixel(height - 1 - y, x, original->getpixel(x, y));
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                result.setpixel(height - 1 - y, x, original->_pic.getpixel(x, y));
             }
         }
 
-        original->setimage(result.getimage());
+        original->_pic.setimage(result.getimage());
     }
 }
 
-void PicLibrary::flipVH(char plane, string filename) {
+void PicLibrary::flipVH(char plane, string filename)
+{
 
     auto original = pictureStore[filename];
+    std::lock_guard<std::mutex> lock(original->_mtx);
 
-    int width = original->getwidth();
-    int height = original->getheight();
+    int width = original->_pic.getwidth();
+    int height = original->_pic.getheight();
 
     Picture result = Picture(width, height);
 
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
             Colour newColour(0, 0, 0);
-            if (plane == 'V') {
-                newColour = original->getpixel(x, height - 1 - y);
-            } else {
-                newColour = original->getpixel(width - 1 - x, y);
+            if (plane == 'V')
+            {
+                newColour = original->_pic.getpixel(x, height - 1 - y);
+            }
+            else
+            {
+                newColour = original->_pic.getpixel(width - 1 - x, y);
             }
             result.setpixel(x, y, newColour);
         }
     }
-    original->setimage(result.getimage());
+    original->_pic.setimage(result.getimage());
 }
 
-void PicLibrary::blur(string filename) {
+void PicLibrary::blur(string filename)
+{
 
     auto original = pictureStore[filename];
+    std::lock_guard<std::mutex> lock(original->_mtx);
 
-    int width = original->getwidth();
-    int height = original->getheight();
+    int width = original->_pic.getwidth();
+    int height = original->_pic.getheight();
 
     Picture result = Picture(width, height);
 
-    for(int i = 0; i < height; i++) {
-        for(int j = 0; j < width; j++) {
-            if((i != 0) && (j != 0) && (i != (height - 1)) && (j != (width - 1))) {
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            if ((i != 0) && (j != 0) && (i != (height - 1)) && (j != (width - 1)))
+            {
                 int red = 0;
                 int blue = 0;
                 int green = 0;
-                for(int k = (i - BLUR_RADIUS); k <= (i + BLUR_RADIUS); ++k) {
-                    for(int l = (j - BLUR_RADIUS); l <= (j + BLUR_RADIUS); ++l) {
-                        Colour originalColour = original->getpixel(l, k);
+                for (int k = (i - BLUR_RADIUS); k <= (i + BLUR_RADIUS); ++k)
+                {
+                    for (int l = (j - BLUR_RADIUS); l <= (j + BLUR_RADIUS); ++l)
+                    {
+                        Colour originalColour = original->_pic.getpixel(l, k);
                         red += originalColour.getred();
                         green += originalColour.getgreen();
                         blue += originalColour.getblue();
                     }
                 }
-                result.setpixel(j, i, Colour (red/BLUR_STRENGTH, green/BLUR_STRENGTH, blue/BLUR_STRENGTH));
-            } else {
-                result.setpixel(j, i, original->getpixel(j, i));
+                result.setpixel(j, i, Colour(red / BLUR_STRENGTH, green / BLUR_STRENGTH, blue / BLUR_STRENGTH));
+            }
+            else
+            {
+                result.setpixel(j, i, original->_pic.getpixel(j, i));
             }
         }
     }
-    original->setimage(result.getimage());
+    original->_pic.setimage(result.getimage());
+}
+
+PictureContainer *PicLibrary::getContainer(string filename)
+{
+    return pictureStore[filename];
+}
+
+void PicLibrary::joinAllThreads()
+{
+    for (auto i : pictureStore)
+    {
+        std::for_each(i.second->_threads.begin(), i.second->_threads.end(), [](thread &t) { t.join(); });
+    }
+    for (auto i : pictureStore)
+    {
+        i.second->_threads.clear();
+    }
+}
+void PicLibrary::joinPictureThreads(string filename)
+{
+    if (alreadyInStore(filename))
+    {
+        std::for_each(pictureStore[filename]->_threads.begin(), pictureStore[filename]->_threads.end(), [](thread &t) { t.join(); });
+        pictureStore[filename]->_threads.clear();
+    }
 }
