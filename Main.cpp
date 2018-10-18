@@ -43,9 +43,9 @@ int main(int argc, char **argv) {
 
         if (command == "load") {
             cin >> path >> filename;
-            if(library.didPictureLoad(filename)){
-                cerr << "Error when loading picture at " << path << ": picture named " << filename << " already exists in store" << endl;
-            }
+            // if(library.didPictureLoad(filename)){
+            //     cerr << "Error when loading picture at " << path << ": picture named " << filename << " already exists in store" << endl;
+            // }
             library.loadpicture(path, filename);
         }
 
