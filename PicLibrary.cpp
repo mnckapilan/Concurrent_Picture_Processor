@@ -32,7 +32,7 @@ void PicLibrary::print_picturestore()
 
 bool PicLibrary::loadpicture(string path, string filename)
 {
-    if (pictureStore.find(filename) != pictureStore.end())
+    if (alreadyInStore(filename))
     {
         return false;
     }

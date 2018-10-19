@@ -40,7 +40,6 @@ int main(int argc, char **argv)
     int angle;
     char plane;
 
-    cout << "prmt>";
     cin >> command;
 
     while (command != "exit" && cin.peek() != EOF)
@@ -54,14 +53,14 @@ int main(int argc, char **argv)
         if (command == "load")
         {
             cin >> path >> filename;
-            if (library.alreadyInStore(filename))
-            {
-                cerr << " Error when loading picture at " << path << " : picture named " << filename << " already exists in store" << endl;
-            }
             bool success = library.loadpicture(path, filename);
             if (success)
             {
                 cout << " picture loaded successfully from " << path << endl;
+            }
+            else
+            {
+                cerr << " Error when loading picture at " << path << " : picture named " << filename << " already exists in store" << endl;
             }
         }
 

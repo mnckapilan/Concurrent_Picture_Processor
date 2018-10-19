@@ -1,28 +1,33 @@
 #ifndef PICTURE_H
 #define PICTURE_H
 
-#include<thread>
-#include<mutex>
+#include <thread>
+#include <mutex>
 
 #include "Colour.hpp"
 #include "Utils.hpp"
 
-class Picture {
+class Picture
+{
 
-  private:
-    // opencv representation of an image
-    Mat img;
-    Utils imgio;
+private:
+  // opencv representation of an image
+  Mat img;
+  Utils imgio;
 
-  public:
-      
-  enum RGB {BLUE, GREEN, RED};
- 
+public:
+  enum RGB
+  {
+    BLUE,
+    GREEN,
+    RED
+  };
+
   // class constructor, loads an image from a provided file
   Picture(string path);
 
-  // class constructor, creates an image provided the size 
-  Picture(int width, int height);  
+  // class constructor, creates an image provided the size
+  Picture(int width, int height);
 
   // default constructor/deconstructor
   Picture();
@@ -43,18 +48,18 @@ class Picture {
 
   // provides the image of the class
   Mat getimage();
-  
+
   // overwrite Picture image with another image
   void setimage(Mat cpyimg);
-  
- };
-class PictureContainer {
+};
+class PictureContainer
+{
 public:
-    Picture _pic;
-    vector<thread> _threads;
-    mutex _mtx;
+  Picture _pic;
+  vector<thread> _threads;
+  mutex _mtx;
 
-    PictureContainer(Picture *pic);
-    ~PictureContainer();
+  PictureContainer(Picture *pic);
+  ~PictureContainer();
 };
 #endif

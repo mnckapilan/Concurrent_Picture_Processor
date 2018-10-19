@@ -33,7 +33,7 @@ public:
   bool display(string filename);
 
   //added functions
-  PictureContainer* getContainer(string filename);
+  PictureContainer *getContainer(string filename);
   bool alreadyInStore(string filename);
   void joinAllThreads();
   void joinPictureThreads(string filename);
