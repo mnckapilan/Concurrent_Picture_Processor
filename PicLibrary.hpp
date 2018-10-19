@@ -13,6 +13,20 @@
 #include "Picture.hpp"
 #include "Utils.hpp"
 
+/*   Thread-safe synchronization strategy
+
+ *  I initially added a mutex to the Picture class, but since mutexes are non
+ *  -movable and non-copyable and that will lead to errors during lookups and insertions.
+ *  
+ *  After some consulting of my friends, I decided to create "Picture Containers" which 
+ *  contain instances of the picture, a corresponding mutex and a vector of threads. The threads are those
+ *  that are trying to modify the particular Picture in its container.
+ * 
+ *  I had to change the previous map of Pictures (which I used for the sequential implementation) 
+ *  into a map of containers to make this work, as well as create threads when commands that 
+ *  modify the images are invoked 
+ */
+
 class PicLibrary
 {
 
