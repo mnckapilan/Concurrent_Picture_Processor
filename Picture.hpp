@@ -7,9 +7,6 @@
 #include "Colour.hpp"
 #include "Utils.hpp"
 
-// The Picture class  provided a wrapper for image manipulation via the opencv
-// library
-
 class Picture {
 
   private:
