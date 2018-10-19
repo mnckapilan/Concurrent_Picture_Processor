@@ -61,7 +61,7 @@ int main(int argc, char **argv)
             bool success = library.loadpicture(path, filename);
             if (success)
             {
-                cout << " picture loaded successfully from " << path <<endl;
+                cout << " picture loaded successfully from " << path << endl;
             }
         }
 
@@ -163,7 +163,6 @@ int main(int argc, char **argv)
         {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
-        cout << "prmt>";
         cin >> command;
     }
     library.joinAllThreads();
