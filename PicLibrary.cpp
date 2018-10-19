@@ -23,10 +23,9 @@ bool PicLibrary::alreadyInStore(string filename)
 
 void PicLibrary::print_picturestore()
 {
-
     for (auto const &pair : pictureStore)
     {
-        cout << pair.first << std::flush << endl;
+        cout << pair.first << endl << std::flush;
     }
 }
 
